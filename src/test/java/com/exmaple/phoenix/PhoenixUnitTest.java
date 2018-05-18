@@ -1,6 +1,7 @@
 package com.exmaple.phoenix;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.StringReader;
 import java.sql.DriverManager;
@@ -50,15 +51,12 @@ public class PhoenixUnitTest extends BaseHBaseManagedTimeIT {
 			CSVCommonsLoader csvUtil = new CSVCommonsLoader(conn, STOCK_TABLE, Collections.<String>emptyList(), true);
 			csvUtil.upsert(new StringReader(STOCK_CSV_VALUES_WITH_HEADER));
 
-			PreparedStatement statement = conn.prepareStatement("SELECT SYMBOL, COMPANY FROM " + STOCK_TABLE);
+			PreparedStatement statement = conn.prepareStatement("SELECT COUNT(*) FROM " + STOCK_TABLE);
 			ResultSet phoenixResultSet = statement.executeQuery();
 
 			while (phoenixResultSet.next()) {
-				System.out.println(phoenixResultSet.getString(1));
+				assertEquals(9, phoenixResultSet.getInt(1));
 			}
-			
-			assertFalse(phoenixResultSet.next());
-			
 		} finally {
 			if (conn != null) {
 				conn.close();
